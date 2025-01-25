@@ -119,11 +119,26 @@ export default function DashboardPage() {
           {/* Note Examples */}
           <div className="w-[300px] h-[200px] lg:w-[400px] lg:h-[300px] flex flex-col p-2 rounded-lg hover:shadow-md hover:-translate-y-0.5 transition-all bg-slate-200">
             {/* title note */}
-            <div className="w-full h-fit bg-red-200">
+            <div className="w-full h-fit bg-red-200 flex flex-row">
               {/* note title */}
-              <h1 className="text-base lg:text-xl">Note title #1</h1>
-              <div>
-                {/* icons */}
+              <h1 className="text-base lg:text-xl font-bold truncate">Note title #1</h1>
+              <div className="flex flex-row ml-auto gap-x-2">
+                {/* icon di-klik untuk edit note */}
+                <Image
+                  src={"/edit-icon.svg"}
+                  width={0}
+                  height={0}
+                  className="w-6 h-6 lg:w-8 lg:h-8 cursor-pointer"
+                  alt="edit Icon"
+                />
+                {/* icon di-klik untuk delete note */}
+                <Image
+                  src={"/delete-icon.svg"}
+                  width={0}
+                  height={0}
+                  className="w-6 h-6 lg:w-8 lg:h-8 cursor-pointer"
+                  alt="edit Icon"
+                />
               </div>
             </div>
             {/* note content */}
@@ -134,7 +149,10 @@ export default function DashboardPage() {
         </div>
       </div>
       {/* button untuk tambah note */}
-      <div onClick={() => setIsModalOpen(true)} className="absolute bottom-5 right-2.5 lg:bottom-10 lg:right-5 rounded-full w-16 h-16 lg:w-20 lg:h-20 bg-gray-400 hover:bg-gray-500 flex justify-center items-center group">
+      <div
+        onClick={() => setIsModalOpen(true)}
+        className="absolute bottom-5 right-2.5 lg:bottom-10 lg:right-5 rounded-full w-16 h-16 lg:w-20 lg:h-20 bg-gray-400 hover:bg-gray-500 flex justify-center items-center group"
+      >
         <Image
           src={"/plus-icon.svg"}
           width={0}
@@ -144,7 +162,6 @@ export default function DashboardPage() {
         />
       </div>
       {/* end of button untuk tambah note */}
-
 
       {/* Modal */}
       {isModalOpen && (
@@ -184,8 +201,5 @@ export default function DashboardPage() {
         </div>
       )}
     </div>
-
-
-
   );
 }

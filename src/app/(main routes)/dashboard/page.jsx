@@ -163,7 +163,7 @@ export default function DashboardPage() {
         {/* Notes Container */}
         <div className="w-full h-full grid grid-cols-1 lg:grid-cols-3 gap-5 items-start p-10">
           {/* Note Examples */}
-          <div className="w-[300px] h-[200px] lg:w-[400px] lg:min-h-[300px] flex flex-col p-2 rounded-lg hover:shadow-lg shadow-md transition-all bg-slate-100">
+          <div className="w-[300px] h-[280px] lg:w-[400px] lg:min-h-[300px] flex flex-col p-2 rounded-lg hover:shadow-lg shadow-md transition-all bg-slate-100">
             {/* title note */}
             <div className="w-full h-fit flex flex-row">
               {/* note title */}

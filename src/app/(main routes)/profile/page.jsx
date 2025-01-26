@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -70,6 +71,25 @@ export default function ProfilePage() {
             <div className="w-10/12 lg:h-1 h-0.5 bg-white rounded-3xl group-hover:rotate-[20deg] group-hover:w-1/2 group-hover:-translate-x-2 group-hover:-translate-y-1 transition-all"></div>
           </div>
         </div>
+
+        {/* content profile */}
+        <div className="w-full h-full flex flex-col justify-center items-center">
+          <div className="w-full h-full lg:w-fit lg:h-fit bg-slate-100 rounded-3xl lg:p-20 mt-20 lg:mt-0 shadow-md flex flex-col gap-3 lg:gap-5 justify-center items-center text-lg lg:text-xl">
+            <Image
+              src={"/profile-icon.svg"}
+              width={0}
+              height={0}
+              className="w-36 h-36 lg:w-44 lg:h-44 cursor-pointer hover:rotate-12 transition"
+              alt="edit Icon"
+            />
+            <p>Name : </p>
+            <p>Email : </p>
+
+            {/* logout button */}
+            <div className="bg-red-400 hover:bg-red-500 px-4 py-2 rounded-3xl mt-10 text-white cursor pointer">Logout</div>
+          </div>
+        </div>
+        {/* end of content profile */}
       </div>
     </div>
   );

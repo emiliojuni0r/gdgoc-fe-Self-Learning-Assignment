@@ -13,6 +13,8 @@ export default function DashboardPage() {
   const [tags, setTags] = useState([]); // State untuk tags
   const [currentTag, setCurrentTag] = useState(""); // Tag yang sedang diketik
   const [folder, setFolder] = useState(""); // State untuk folder
+  const [isEditMode, setIsEditMode] = useState(false); // Menentukan mode edit
+  const [editingNote, setEditingNote] = useState(null); // Catatan yang sedang diedit
   const pathname = usePathname();
 
   const handleAddTag = () => {
@@ -22,22 +24,48 @@ export default function DashboardPage() {
     }
   };
 
+  const handleOpenEditModal = (note) => {
+    setEditingNote(note);
+    setTitle(note.title);
+    setContent(note.content);
+    setTags(note.tags || []);
+    setIsEditMode(true);
+    setIsModalOpen(true);
+  };
+
   const handleRemoveTag = (tagToRemove) => {
     setTags(tags.filter((tag) => tag !== tagToRemove));
   };
 
   const handleSaveNote = () => {
-    console.log("Title:", title);
-    console.log("Content:", content);
-    console.log("Tags:", tags);
-    console.log("Folder:", folder);
+    if (isEditMode && editingNote) {
+      console.log("Edit Note ID:", editingNote.id);
+      console.log("Updated Title:", title);
+      console.log("Updated Content:", content);
+      console.log("Updated Tags:", tags);
+    } else {
+      console.log("New Note");
+      console.log("Title:", title);
+      console.log("Content:", content);
+      console.log("Tags:", tags);
+      console.log("Folder:", folder);
+    }
 
     // Reset form dan tutup modal
     setTitle("");
     setContent("");
     setTags([]);
     setFolder("");
+    setEditingNote(null);
+    setIsEditMode(false);
     setIsModalOpen(false);
+  };
+
+  const sampleNote = {
+    id: 1,
+    title: "Note title #1",
+    content: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Ad, quas ut harum incidunt necessitatibus quaerat consequuntur aliquam, libero cum odio ea sint, dolorum quia quis doloribus suscipit dicta odit amet?",
+    tags: ["tag 1", "tag 2"],
   };
 
   return (
@@ -135,12 +163,12 @@ export default function DashboardPage() {
         {/* Notes Container */}
         <div className="w-full h-full grid grid-cols-1 lg:grid-cols-3 gap-5 items-start p-10">
           {/* Note Examples */}
-          <div className="w-[300px] h-[200px] lg:w-[400px] lg:h-[300px] flex flex-col p-2 rounded-lg hover:shadow-lg shadow-md transition-all bg-slate-100">
+          <div className="w-[300px] h-[200px] lg:w-[400px] lg:min-h-[300px] flex flex-col p-2 rounded-lg hover:shadow-lg shadow-md transition-all bg-slate-100">
             {/* title note */}
-            <div className="w-full h-fit bg-red-200 flex flex-row">
+            <div className="w-full h-fit flex flex-row">
               {/* note title */}
               <h1 className="text-base lg:text-xl font-bold truncate">
-                Note title #1
+                {sampleNote.title}
               </h1>
               <div className="flex flex-row ml-auto gap-x-2">
                 {/* icon di-klik untuk edit note */}
@@ -150,6 +178,7 @@ export default function DashboardPage() {
                   height={0}
                   className="w-6 h-6 lg:w-8 lg:h-8 cursor-pointer hover:rotate-12 transition"
                   alt="edit Icon"
+                  onClick={() => handleOpenEditModal(sampleNote)}
                 />
                 {/* icon di-klik untuk delete note */}
                 <Image
@@ -162,22 +191,35 @@ export default function DashboardPage() {
               </div>
             </div>
             {/* note content */}
-            <div className="w-full h-full bg-red-300 mt-1 lg:mt-2">
-              note contenttt
+            <div className="w-full h-full mt-1 lg:mt-2">
+              {sampleNote.content}
             </div>
+            {/* <div className="flex gap-2 flex-wrap mt-2">
+              {tags.map((tag, index) => (
+              <span
+                key={index}
+                className="bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-sm flex items-center gap-2"
+              >
+                tag 1
+              </span>
+               ))}
+            </div> */}
             <div className="flex gap-2 flex-wrap mt-2">
-                  {/* {tags.map((tag, index) => ( */}
-                    <span
-                      // key={index}
-                      className="bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-sm flex items-center gap-2"
-                    >
-                      tag 1
-                    </span>
-                  {/* ))} */}
-                </div>
+              {sampleNote.tags.map((tag, index) => (
+                <span
+                  key={index}
+                  className="bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-sm"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+            {/* time (kapan di update atau dibuat) */}
+            <p className="text-xs lg:text-sm font-thin">3d ago</p>
           </div>
         </div>
       </div>
+
       {/* button untuk tambah note */}
       <div
         onClick={() => setIsModalOpen(true)}
@@ -193,47 +235,17 @@ export default function DashboardPage() {
       </div>
       {/* end of button untuk tambah note */}
 
+
+
       {/* Modal untuk menambah notes */}
-      {/* {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white w-[90%] max-w-lg p-5 rounded-lg shadow-lg">
-            <h2 className="text-lg font-bold mb-4">Add New Note</h2>
-            <div className="flex flex-col gap-4">
-              <input
-                type="text"
-                placeholder="Note Title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="border border-gray-300 rounded-md p-2 w-full focus:ring-2 focus:ring-blue-500"
-              />
-              <textarea
-                placeholder="Note Content"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                className="border border-gray-300 rounded-md p-2 w-full h-32 focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div className="flex justify-end gap-2 mt-4">
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 transition"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSaveNote}
-                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
-      )} */}
+
+      {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white w-[90%] max-w-lg p-5 rounded-lg shadow-lg">
-            <h2 className="text-lg font-bold mb-4">Add New Note</h2>
+            <h2 className="text-lg font-bold mb-4">
+              {isEditMode ? "Edit Note" : "Add New Note"}
+            </h2>
             <div className="flex flex-col gap-4">
               <input
                 type="text"

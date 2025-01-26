@@ -7,18 +7,36 @@ import Link from "next/link";
 
 export default function DashboardPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false); // State untuk modal
-  const [title, setTitle] = useState(""); // State untuk title
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [tags, setTags] = useState([]); // State untuk tags
+  const [currentTag, setCurrentTag] = useState(""); // Tag yang sedang diketik
+  const [folder, setFolder] = useState(""); // State untuk folder
   const pathname = usePathname();
+
+  const handleAddTag = () => {
+    if (currentTag && !tags.includes(currentTag)) {
+      setTags([...tags, currentTag]);
+      setCurrentTag("");
+    }
+  };
+
+  const handleRemoveTag = (tagToRemove) => {
+    setTags(tags.filter((tag) => tag !== tagToRemove));
+  };
 
   const handleSaveNote = () => {
     console.log("Title:", title);
     console.log("Content:", content);
+    console.log("Tags:", tags);
+    console.log("Folder:", folder);
 
     // Reset form dan tutup modal
     setTitle("");
     setContent("");
+    setTags([]);
+    setFolder("");
     setIsModalOpen(false);
   };
 
@@ -86,7 +104,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Searchbar */}
-          <form action="" className="w-fit h-fit relative flex-1 px-4">
+          <form action="" className="w-fit h-fit relative flex-1 px-4 group">
             <input
               type="text"
               className="lg:w-full h-8 rounded-xl pl-8 bg-gray-100 border"
@@ -96,7 +114,7 @@ export default function DashboardPage() {
               src={"/search-icon.svg"}
               width={0}
               height={0}
-              className="w-6 h-6 lg:w-[24px] lg:h-[24px] absolute left-5 top-1.5"
+              className="w-6 h-6 lg:w-[24px] lg:h-[24px] absolute left-5 top-1.5 group-hover:rotate-12 group-hover:-translate-y-1 transition"
               alt="Search Icon"
             />
           </form>
@@ -117,18 +135,20 @@ export default function DashboardPage() {
         {/* Notes Container */}
         <div className="w-full h-full grid grid-cols-1 lg:grid-cols-3 gap-5 items-start p-10">
           {/* Note Examples */}
-          <div className="w-[300px] h-[200px] lg:w-[400px] lg:h-[300px] flex flex-col p-2 rounded-lg hover:shadow-md hover:-translate-y-0.5 transition-all bg-slate-200">
+          <div className="w-[300px] h-[200px] lg:w-[400px] lg:h-[300px] flex flex-col p-2 rounded-lg hover:shadow-lg shadow-md transition-all bg-slate-100">
             {/* title note */}
             <div className="w-full h-fit bg-red-200 flex flex-row">
               {/* note title */}
-              <h1 className="text-base lg:text-xl font-bold truncate">Note title #1</h1>
+              <h1 className="text-base lg:text-xl font-bold truncate">
+                Note title #1
+              </h1>
               <div className="flex flex-row ml-auto gap-x-2">
                 {/* icon di-klik untuk edit note */}
                 <Image
                   src={"/edit-icon.svg"}
                   width={0}
                   height={0}
-                  className="w-6 h-6 lg:w-8 lg:h-8 cursor-pointer"
+                  className="w-6 h-6 lg:w-8 lg:h-8 cursor-pointer hover:rotate-12 transition"
                   alt="edit Icon"
                 />
                 {/* icon di-klik untuk delete note */}
@@ -136,7 +156,7 @@ export default function DashboardPage() {
                   src={"/delete-icon.svg"}
                   width={0}
                   height={0}
-                  className="w-6 h-6 lg:w-8 lg:h-8 cursor-pointer"
+                  className="w-6 h-6 lg:w-8 lg:h-8 cursor-pointer hover:rotate-12 transition"
                   alt="edit Icon"
                 />
               </div>
@@ -145,6 +165,16 @@ export default function DashboardPage() {
             <div className="w-full h-full bg-red-300 mt-1 lg:mt-2">
               note contenttt
             </div>
+            <div className="flex gap-2 flex-wrap mt-2">
+                  {/* {tags.map((tag, index) => ( */}
+                    <span
+                      // key={index}
+                      className="bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-sm flex items-center gap-2"
+                    >
+                      tag 1
+                    </span>
+                  {/* ))} */}
+                </div>
           </div>
         </div>
       </div>
@@ -163,7 +193,43 @@ export default function DashboardPage() {
       </div>
       {/* end of button untuk tambah note */}
 
-      {/* Modal */}
+      {/* Modal untuk menambah notes */}
+      {/* {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white w-[90%] max-w-lg p-5 rounded-lg shadow-lg">
+            <h2 className="text-lg font-bold mb-4">Add New Note</h2>
+            <div className="flex flex-col gap-4">
+              <input
+                type="text"
+                placeholder="Note Title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="border border-gray-300 rounded-md p-2 w-full focus:ring-2 focus:ring-blue-500"
+              />
+              <textarea
+                placeholder="Note Content"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                className="border border-gray-300 rounded-md p-2 w-full h-32 focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div className="flex justify-end gap-2 mt-4">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveNote}
+                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )} */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white w-[90%] max-w-lg p-5 rounded-lg shadow-lg">
@@ -182,6 +248,57 @@ export default function DashboardPage() {
                 onChange={(e) => setContent(e.target.value)}
                 className="border border-gray-300 rounded-md p-2 w-full h-32 focus:ring-2 focus:ring-blue-500"
               />
+              <div>
+                <label className="font-semibold">Tags:</label>
+                <div className="flex gap-2 items-center mt-2">
+                  <input
+                    type="text"
+                    placeholder="Add a tag"
+                    value={currentTag}
+                    onChange={(e) => setCurrentTag(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleAddTag()}
+                    className="border border-gray-300 rounded-md p-2 flex-1 focus:ring-2 focus:ring-blue-500"
+                  />
+                  <button
+                    onClick={handleAddTag}
+                    className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition"
+                  >
+                    Add
+                  </button>
+                </div>
+                <div className="flex gap-2 flex-wrap mt-2">
+                  {tags.map((tag, index) => (
+                    <span
+                      key={index}
+                      className="bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-sm flex items-center gap-2"
+                    >
+                      {tag}
+                      <button
+                        onClick={() => handleRemoveTag(tag)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="font-semibold">Folder:</label>
+                <select
+                  value={folder}
+                  onChange={(e) => setFolder(e.target.value)}
+                  className="border border-gray-300 rounded-md p-2 w-full focus:ring-2 focus:ring-blue-500 mt-2"
+                >
+                  <option value="" disabled>
+                    Select a folder
+                  </option>
+                  <option value="Personal">Personal</option>
+                  <option value="Work">Work</option>
+                  <option value="Ideas">Ideas</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
             </div>
             <div className="flex justify-end gap-2 mt-4">
               <button

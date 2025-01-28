@@ -116,7 +116,7 @@ export default function DashboardPage() {
           setIsSidebarOpen={setIsSidebarOpen}
         >
           {/* Searchbar */}
-          <form action="" className="w-fit lg:w-[1000px] h-fit relative px-4 group">
+          <form action="" className="w-fit sm:w-[700px] lg:w-[1000px] h-fit relative px-4 group">
             <input
               type="text"
               className="w-full lg:w-full h-8 rounded-xl pl-8 bg-gray-100 border"
@@ -161,11 +161,11 @@ export default function DashboardPage() {
         </Link>
 
         {/* Notes Container */}
-        <div className="w-full h-full grid grid-cols-1 lg:grid-cols-3 gap-5 items-start p-10">
+        <div className="w-full h-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-7 lg:gap-x-2 lg:gap-y-8 items-start p-10">
           {filteredNotes.map((note) => (
             <div
               key={note.note_id}
-              className="w-[300px] h-[280px] lg:w-[400px] lg:min-h-[300px] flex flex-col p-2 rounded-lg hover:shadow-lg shadow-md transition-all bg-slate-100"
+              className="w-[300px] h-[280px] sm:w-[290px] lg:w-[400px] lg:min-h-[300px] flex flex-col p-2 rounded-lg hover:shadow-lg shadow-md transition-all bg-slate-100"
             >
               <div className="w-full h-fit flex flex-row">
                 <h1 className="text-base lg:text-xl font-bold truncate">{note.title}</h1>

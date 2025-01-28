@@ -43,11 +43,28 @@ export default function DashboardPage() {
     });
 
     if (response.ok) {
-      // Update the notes state to remove the deleted note
       setNotes(notes.filter(note => note.note_id !== noteId));
     } else {
       console.error("Failed to delete note");
     }
+  };
+
+  // calculate time for notes (left bottom part)
+  const timeAgo = (timestamp) => {
+    const now = new Date();
+    const seconds = Math.floor((now - new Date(timestamp)) / 1000);
+    let interval = Math.floor(seconds / 31536000);
+
+    if (interval > 1) return `${interval} years ago`;
+    interval = Math.floor(seconds / 2592000);
+    if (interval > 1) return `${interval} months ago`;
+    interval = Math.floor(seconds / 86400);
+    if (interval > 1) return `${interval} days ago`;
+    interval = Math.floor(seconds / 3600);
+    if (interval > 1) return `${interval} hours ago`;
+    interval = Math.floor(seconds / 60);
+    if (interval > 1) return `${interval} minutes ago`;
+    return `${seconds} seconds ago`;
   };
 
   return (
@@ -136,16 +153,14 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div className="w-full h-full mt-1 lg:mt-2 line-clamp-6">
-                <p>
-                {note.content}
-                </p>
+                <p>{note.content}</p>
               </div>
               <div className="flex gap-2 flex-wrap mt-2">
-                {(note.tags).map((tag, index) => (
+                {note.tags.map((tag, index) => (
                   <span key={index} className="bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-sm">{tag}</span>
                 ))}
               </div>
-              <p className="text-xs lg:text-sm font-thin">3d ago</p>
+              <p className="text-xs lg:text-sm font-thin">{timeAgo(note.created_at)}</p>
             </div>
           ))}
         </div>

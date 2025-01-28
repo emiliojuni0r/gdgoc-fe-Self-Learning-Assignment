@@ -75,17 +75,20 @@
 //   );
 // }
 
-
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import Header from "@/app/components/Header";
+import Sidebar from "@/app/components/Sidebar";
 
 export default function CreateNotePage() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [tags, setTags] = useState([]);
   const [currentTag, setCurrentTag] = useState("");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const pathname = usePathname();
   const router = useRouter();
 
   const handleAddTag = () => {
@@ -115,6 +118,18 @@ export default function CreateNotePage() {
 
   return (
     <div className="w-screen h-screen flex flex-col relative">
+      {/* Sidebar */}
+      <Sidebar
+        isSidebarOpen={isSidebarOpen}
+        setIsSidebarOpen={setIsSidebarOpen}
+        pathname={pathname}
+      />
+      {/* end of sidebar */}
+      {/* Header */}
+      <Header
+        isSidebarOpen={isSidebarOpen}
+        setIsSidebarOpen={setIsSidebarOpen}
+      ></Header>
       <div className="px-5 lg:px-14 pt-4 lg:pt-6">
         <h2 className="text-lg font-bold mb-4">Create New Note</h2>
         <input

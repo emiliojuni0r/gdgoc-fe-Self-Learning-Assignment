@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import Sidebar from "@/app/components/Sidebar";
+import Header from "@/app/components/Header";
 
 export default function EditNotePage({ params }) {
   const { id } = params;
@@ -10,6 +12,8 @@ export default function EditNotePage({ params }) {
   const [content, setContent] = useState("");
   const [tags, setTags] = useState([]);
   const [currentTag, setCurrentTag] = useState("");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const pathname = usePathname();
   const router = useRouter();
 
   useEffect(() => {
@@ -64,6 +68,18 @@ export default function EditNotePage({ params }) {
 
   return (
     <div className="w-screen h-screen flex flex-col relative">
+      {/* Sidebar */}
+      <Sidebar
+        isSidebarOpen={isSidebarOpen}
+        setIsSidebarOpen={setIsSidebarOpen}
+        pathname={pathname}
+      />
+      {/* end of sidebar */}
+      {/* Header */}
+      <Header
+        isSidebarOpen={isSidebarOpen}
+        setIsSidebarOpen={setIsSidebarOpen}
+      ></Header>
       <div className="px-5 lg:px-14 pt-4 lg:pt-6">
         <h2 className="text-lg font-bold mb-4">Edit Note</h2>
         <input

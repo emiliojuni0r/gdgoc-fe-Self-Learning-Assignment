@@ -9,7 +9,10 @@ import Header from "@/app/components/Header";
 
 export default function DashboardPage() {
   const [notes, setNotes] = useState([]);
+  const [filteredNotes, setFilteredNotes] = useState([]); // State untuk menyimpan catatan yang difilter
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [sortOption, setSortOption] = useState(""); // State untuk menyimpan opsi sorting
+  const [searchQuery, setSearchQuery] = useState(""); // State untuk menyimpan query pencarian
   const pathname = usePathname();
   const router = useRouter();
 
@@ -25,6 +28,7 @@ export default function DashboardPage() {
       if (response.ok) {
         const data = await response.json();
         setNotes(data);
+        setFilteredNotes(data); // Set catatan yang difilter saat data diambil
       } else {
         console.error("Failed to fetch notes");
       }
@@ -44,12 +48,12 @@ export default function DashboardPage() {
 
     if (response.ok) {
       setNotes(notes.filter(note => note.note_id !== noteId));
+      setFilteredNotes(filteredNotes.filter(note => note.note_id !== noteId)); // Update filtered notes
     } else {
       console.error("Failed to delete note");
     }
   };
 
-  // calculate time for notes (left bottom part)
   const timeAgo = (timestamp) => {
     const now = new Date();
     const seconds = Math.floor((now - new Date(timestamp)) / 1000);
@@ -65,6 +69,37 @@ export default function DashboardPage() {
     interval = Math.floor(seconds / 60);
     if (interval > 1) return `${interval} minutes ago`;
     return `${seconds} seconds ago`;
+  };
+
+  const handleSortChange = (e) => {
+    const value = e.target.value;
+    setSortOption(value);
+    sortNotes(value);
+  };
+
+  const sortNotes = (option) => {
+    let sortedNotes = [...filteredNotes]; // Sort based on filtered notes
+    if (option === "latest") {
+      sortedNotes.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    } else if (option === "oldest") {
+      sortedNotes.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+    } else if (option === "alphabetical") {
+      sortedNotes.sort((a, b) => a.title.localeCompare(b.title));
+    } else if (option === "alphabeticalDescending") {
+      sortedNotes.sort((a, b) => b.title.localeCompare(a.title));
+    }
+    setFilteredNotes(sortedNotes);
+  };
+
+  const handleSearchChange = (e) => {
+    const query = e.target.value.toLowerCase();
+    setSearchQuery(query);
+    
+    // Filter notes based on the search query
+    const filtered = notes.filter(note => 
+      note.title.toLowerCase().includes(query)
+    );
+    setFilteredNotes(filtered);
   };
 
   return (
@@ -86,6 +121,8 @@ export default function DashboardPage() {
               type="text"
               className="w-full lg:w-full h-8 rounded-xl pl-8 bg-gray-100 border"
               placeholder="Search your note here"
+              value={searchQuery} // Bind input value to searchQuery
+              onChange={handleSearchChange} // Call handleSearchChange on input change
             />
             <Image
               src={"/search-icon.svg"}
@@ -99,7 +136,7 @@ export default function DashboardPage() {
           {/* Sorting */}
           <select
             className="border p-1 lg:p-1 rounded-md w-20 lg:w-48 h-8 items-center text-xs lg:text-base justify-center"
-            onChange={(e) => console.log("Sorting by:", e.target.value)}
+            onChange={handleSortChange}
           >
             <option value="">sort by</option>
             <option value="latest">Latest</option>
@@ -125,7 +162,7 @@ export default function DashboardPage() {
 
         {/* Notes Container */}
         <div className="w-full h-full grid grid-cols-1 lg:grid-cols-3 gap-5 items-start p-10">
-          {notes.map((note) => (
+          {filteredNotes.map((note) => (
             <div
               key={note.note_id}
               className="w-[300px] h-[280px] lg:w-[400px] lg:min-h-[300px] flex flex-col p-2 rounded-lg hover:shadow-lg shadow-md transition-all bg-slate-100"

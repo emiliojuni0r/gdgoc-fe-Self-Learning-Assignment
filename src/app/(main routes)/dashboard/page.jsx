@@ -13,6 +13,8 @@ export default function DashboardPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [sortOption, setSortOption] = useState(""); // State untuk menyimpan opsi sorting
   const [searchQuery, setSearchQuery] = useState(""); // State untuk menyimpan query pencarian
+  const [selectedTags, setSelectedTags] = useState([]); // State untuk menyimpan tags yang dipilih
+  const [uniqueTags, setUniqueTags] = useState([]); // State untuk menyimpan tags unik
   const pathname = usePathname();
   const router = useRouter();
 
@@ -29,6 +31,13 @@ export default function DashboardPage() {
         const data = await response.json();
         setNotes(data);
         setFilteredNotes(data); // Set catatan yang difilter saat data diambil
+
+        // Ambil tags unik dari catatan
+        const tags = new Set();
+        data.forEach((note) => {
+          note.tags.forEach((tag) => tags.add(tag));
+        });
+        setUniqueTags(Array.from(tags)); // Set tags unik
       } else {
         console.error("Failed to fetch notes");
       }
@@ -47,8 +56,8 @@ export default function DashboardPage() {
     });
 
     if (response.ok) {
-      setNotes(notes.filter(note => note.note_id !== noteId));
-      setFilteredNotes(filteredNotes.filter(note => note.note_id !== noteId)); // Update filtered notes
+      setNotes(notes.filter((note) => note.note_id !== noteId));
+      setFilteredNotes(filteredNotes.filter((note) => note.note_id !== noteId)); // Update filtered notes
     } else {
       console.error("Failed to delete note");
     }
@@ -80,9 +89,13 @@ export default function DashboardPage() {
   const sortNotes = (option) => {
     let sortedNotes = [...filteredNotes]; // Sort based on filtered notes
     if (option === "latest") {
-      sortedNotes.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      sortedNotes.sort(
+        (a, b) => new Date(b.created_at) - new Date(a.created_at)
+      );
     } else if (option === "oldest") {
-      sortedNotes.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+      sortedNotes.sort(
+        (a, b) => new Date(a.created_at) - new Date(b.created_at)
+      );
     } else if (option === "alphabetical") {
       sortedNotes.sort((a, b) => a.title.localeCompare(b.title));
     } else if (option === "alphabeticalDescending") {
@@ -94,10 +107,23 @@ export default function DashboardPage() {
   const handleSearchChange = (e) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
-    
+
     // Filter notes based on the search query
-    const filtered = notes.filter(note => 
+    const filtered = notes.filter((note) =>
       note.title.toLowerCase().includes(query)
+    );
+    setFilteredNotes(filtered);
+  };
+
+  const handleTagChange = (tag) => {
+    const updatedTags = selectedTags.includes(tag)
+      ? selectedTags.filter((t) => t !== tag) // Remove tag if already selected
+      : [...selectedTags, tag]; // Add tag if not selected
+    setSelectedTags(updatedTags);
+
+    // Filter notes based on selected tags
+    const filtered = notes.filter((note) =>
+      updatedTags.every((selectedTag) => note.tags.includes(selectedTag))
     );
     setFilteredNotes(filtered);
   };
@@ -116,7 +142,10 @@ export default function DashboardPage() {
           setIsSidebarOpen={setIsSidebarOpen}
         >
           {/* Searchbar */}
-          <form action="" className="w-fit sm:w-[700px] lg:w-[1000px] h-fit relative px-4 group">
+          <form
+            action=""
+            className="w-fit sm:w-[700px] lg:w-[1000px] h-fit relative px-4 group"
+          >
             <input
               type="text"
               className="w-full lg:w-full h-8 rounded-xl pl-8 bg-gray-100 border"
@@ -146,6 +175,23 @@ export default function DashboardPage() {
           </select>
         </Header>
 
+        {/* Filter Tags */}
+        <h1 className="pl-12 pt-4">Filter by tags</h1>
+        <div className="flex flex-wrap gap-2 px-12 py-4">
+          {uniqueTags.map((tag) => (
+            <label key={tag} className="flex items-center">
+              <input
+                type="checkbox"
+                value={tag}
+                checked={selectedTags.includes(tag)}
+                onChange={() => handleTagChange(tag)}
+                className="mr-2"
+              />
+              {tag}
+            </label>
+          ))}
+        </div>
+
         {/* Button to add note */}
         <Link
           href="/create-note"
@@ -167,8 +213,10 @@ export default function DashboardPage() {
               key={note.note_id}
               className="w-[300px] h-[280px] sm:w-[290px] lg:w-[400px] lg:min-h-[300px] flex flex-col p-2 rounded-lg hover:shadow-lg shadow-md transition-all bg-slate-100"
             >
-              <div className="w-full h-fit flex flex-row">
-                <h1 className="text-base lg:text-xl font-bold truncate">{note.title}</h1>
+              <div className="w -full h-fit flex flex-row">
+                <h1 className="text-base lg:text-xl font-bold truncate">
+                  {note.title}
+                </h1>
                 <div className="flex flex-row ml-auto gap-x-2">
                   <Link href={`/edit-note/${note.note_id}`}>
                     <Image
@@ -194,10 +242,17 @@ export default function DashboardPage() {
               </div>
               <div className="flex gap-2 flex-wrap mt-2">
                 {note.tags.map((tag, index) => (
-                  <span key={index} className="bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-sm">{tag}</span>
+                  <span
+                    key={index}
+                    className="bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-sm"
+                  >
+                    {tag}
+                  </span>
                 ))}
               </div>
-              <p className="text-xs lg:text-sm font-thin">{timeAgo(note.created_at)}</p>
+              <p className="text-xs lg:text-sm font-thin">
+                {timeAgo(note.created_at)}
+              </p>
             </div>
           ))}
         </div>

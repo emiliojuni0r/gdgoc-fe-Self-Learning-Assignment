@@ -51,7 +51,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="w-screen h-screen flex flex-col relative">
+    <div className="w-screen h-screen flex flex-col relative overflow-x-hidden no-scrollbar">
       <Sidebar
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
@@ -64,10 +64,10 @@ export default function DashboardPage() {
           setIsSidebarOpen={setIsSidebarOpen}
         >
           {/* Searchbar */}
-          <form action="" className="w-fit h-fit relative flex-1 px-4 group">
+          <form action="" className="w-fit lg:w-[1000px] h-fit relative px-4 group">
             <input
               type="text"
-              className="lg:w-full h-8 rounded-xl pl-8 bg-gray-100 border"
+              className="w-full lg:w-full h-8 rounded-xl pl-8 bg-gray-100 border"
               placeholder="Search your note here"
             />
             <Image
@@ -95,7 +95,7 @@ export default function DashboardPage() {
         {/* Button to add note */}
         <Link
           href="/create-note"
-          className="absolute bottom-5 right-2.5 lg:bottom-10 lg:right-5 rounded-full w-16 h-16 lg:w-20 lg:h-20 bg-gray-400 hover:bg-gray-500 flex justify-center items-center group"
+          className="fixed bottom-5 right-2.5 lg:bottom-10 lg:right-6 rounded-full w-16 h-16 lg:w-20 lg:h-20 bg-gray-400 hover:bg-gray-500 flex justify-center items-center group"
         >
           <Image
             src={"/plus-icon.svg"}
@@ -135,12 +135,16 @@ export default function DashboardPage() {
                   />
                 </div>
               </div>
-              <div className="w-full h-full mt-1 lg:mt-2">{note.content}</div>
-              {/* <div className="flex gap-2 flex-wrap mt-2">
-                {JSON.parse(note.tags).map((tag, index) => (
+              <div className="w-full h-full mt-1 lg:mt-2 line-clamp-6">
+                <p>
+                {note.content}
+                </p>
+              </div>
+              <div className="flex gap-2 flex-wrap mt-2">
+                {(note.tags).map((tag, index) => (
                   <span key={index} className="bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-sm">{tag}</span>
                 ))}
-              </div> */}
+              </div>
               <p className="text-xs lg:text-sm font-thin">3d ago</p>
             </div>
           ))}

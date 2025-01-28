@@ -9,6 +9,7 @@ export default function EditNotePage({ params }) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [tags, setTags] = useState([]);
+  const [currentTag, setCurrentTag] = useState("");
   const router = useRouter();
 
   useEffect(() => {
@@ -25,7 +26,7 @@ export default function EditNotePage({ params }) {
         setNote(data);
         setTitle(data.title);
         setContent(data.content);
-        setTags(JSON.parse(data.tags));
+        setTags(data.tags); // Mengurai tags dari JSON
       } else {
         console.error("Failed to fetch note");
       }
@@ -33,6 +34,13 @@ export default function EditNotePage({ params }) {
 
     fetchNote();
   }, [id]);
+
+  const handleAddTag = () => {
+    if (currentTag && !tags.includes(currentTag)) {
+      setTags([...tags, currentTag]);
+      setCurrentTag("");
+    }
+  };
 
   const handleSaveNote = async () => {
     const token = localStorage.getItem("token");
@@ -77,10 +85,33 @@ export default function EditNotePage({ params }) {
             <input
               type="text"
               placeholder="Add a tag"
-              value={tags.join(',')}
-              onChange={(e) => setTags(e.target.value.split(','))}
-              className="border border-gray-300 rounded-md p-2 flex -1 focus:ring-2 focus:ring-blue-500"
+              value={currentTag}
+              onChange={(e) => setCurrentTag(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleAddTag()}
+              className="border border-gray-300 rounded-md p-2 flex-1 focus:ring-2 focus:ring-blue-500"
             />
+            <button
+              onClick={handleAddTag}
+              className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition"
+            >
+              Add
+            </button>
+          </div>
+          <div className="flex gap-2 flex-wrap mt-2">
+            {tags.map((tag, index) => (
+              <span
+                key={index}
+                className="bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-sm flex items-center gap-2"
+              >
+                {tag}
+                <button
+                  onClick={() => setTags(tags.filter((t) => t !== tag))}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  ×
+                </button>
+              </span>
+            ))}
           </div>
         </div>
         <div className="flex justify-end gap-2 mt-4">

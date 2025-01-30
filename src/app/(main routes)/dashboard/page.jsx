@@ -253,7 +253,7 @@ const timeAgo = (timestamp) => {
           {filteredNotes.map((note) => (
             <div
               key={note.note_id}
-              className="w-[280px] h-[280px] sm:w-[290px] lg:w-[400px] lg:min-h-[300px] flex flex-col p-2 rounded-lg hover:shadow-lg shadow-md transition-all bg-slate-100 cursor-pointer"
+              className="w-[280px] h-[280px] md:w-[320px] lg:w-[450px] lg:min-h-[350px] flex flex-col p-2 rounded-lg hover:shadow-lg shadow-md transition-all bg-slate-100 cursor-pointer"
             >
               <div className="w-full h-fit flex flex-row">
                 <h1 className="text-sm lg:text-xl font-bold truncate">

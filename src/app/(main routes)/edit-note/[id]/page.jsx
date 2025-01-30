@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Sidebar from "@/app/components/Sidebar";
 import Header from "@/app/components/Header";
+import { use } from "react"; // Import use from React
 
 export default function EditNotePage({ params }) {
-  const { id } = params;
+  const { id } = use(params); // Unwrap params using use
   const [note, setNote] = useState(null);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");

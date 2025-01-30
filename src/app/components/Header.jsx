@@ -1,11 +1,10 @@
 "use client";
 
-import Image from "next/image";
 
 export default function Header({children, setIsSidebarOpen,isSidebarOpen}) {
     return(
         
-        <div className="w-full h-14 lg:h-16 bg-gray-300 flex flex-row justify-between items-center px-4 shadow-sm">
+        <div className="fixed top-0 w-full h-14 lg:h-16 bg-gray-300 flex flex-row justify-between items-center px-4 shadow-sm">
           {/* Toggle Sidebar */}
           <div
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}

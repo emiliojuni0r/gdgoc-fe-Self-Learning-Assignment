@@ -6,15 +6,18 @@ import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import Sidebar from "@/app/components/Sidebar";
 import Header from "@/app/components/Header";
+import NoteModal from "@/app/components/NoteModal";
 
 export default function DashboardPage() {
   const [notes, setNotes] = useState([]);
   const [filteredNotes, setFilteredNotes] = useState([]); // State untuk menyimpan catatan yang difilter
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isTagContainerOpen, setIsTagContainerOpen] = useState(false);
   const [sortOption, setSortOption] = useState(""); // State untuk menyimpan opsi sorting
   const [searchQuery, setSearchQuery] = useState(""); // State untuk menyimpan query pencarian
   const [selectedTags, setSelectedTags] = useState([]); // State untuk menyimpan tags yang dipilih
   const [uniqueTags, setUniqueTags] = useState([]); // State untuk menyimpan tags unik
+  const [selectedNote, setSelectedNote] = useState(null); // State untuk menyimpan catatan yang dipilih untuk modal
   const pathname = usePathname();
   const router = useRouter();
 
@@ -63,23 +66,6 @@ export default function DashboardPage() {
     }
   };
 
-  const timeAgo = (timestamp) => {
-    const now = new Date();
-    const seconds = Math.floor((now - new Date(timestamp)) / 1000);
-    let interval = Math.floor(seconds / 31536000);
-
-    if (interval > 1) return `${interval} years ago`;
-    interval = Math.floor(seconds / 2592000);
-    if (interval > 1) return `${interval} months ago`;
-    interval = Math.floor(seconds / 86400);
-    if (interval > 1) return `${interval} days ago`;
-    interval = Math.floor(seconds / 3600);
-    if (interval > 1) return `${interval} hours ago`;
-    interval = Math.floor(seconds / 60);
-    if (interval > 1) return `${interval} minutes ago`;
-    return `${seconds} seconds ago`;
-  };
-
   const handleSortChange = (e) => {
     const value = e.target.value;
     setSortOption(value);
@@ -115,6 +101,24 @@ export default function DashboardPage() {
     setFilteredNotes(filtered);
   };
 
+  // Fungsi untuk menghitung waktu
+const timeAgo = (timestamp) => {
+  const now = new Date();
+  const seconds = Math.floor((now - new Date(timestamp)) / 1000);
+  let interval = Math.floor(seconds / 31536000);
+
+  if (interval > 1) return `${interval} years ago`;
+  interval = Math.floor(seconds / 2592000);
+  if (interval > 1) return `${interval} months ago`;
+  interval = Math.floor(seconds / 86400);
+  if (interval > 1) return `${interval} days ago`;
+  interval = Math.floor(seconds / 3600);
+  if (interval > 1) return `${interval} hours ago`;
+  interval = Math.floor(seconds / 60);
+  if (interval > 1) return `${interval} minutes ago`;
+  return `${seconds} seconds ago`;
+};
+
   const handleTagChange = (tag) => {
     const updatedTags = selectedTags.includes(tag)
       ? selectedTags.filter((t) => t !== tag) // Remove tag if already selected
@@ -126,6 +130,14 @@ export default function DashboardPage() {
       updatedTags.every((selectedTag) => note.tags.includes(selectedTag))
     );
     setFilteredNotes(filtered);
+  };
+
+  const openModal = (note) => {
+    setSelectedNote(note); // Set the selected note for the modal
+  };
+
+  const closeModal = () => {
+    setSelectedNote(null); // Clear the selected note to close the modal
   };
 
   return (
@@ -176,20 +188,50 @@ export default function DashboardPage() {
         </Header>
 
         {/* Filter Tags */}
-        <h1 className="pl-12 pt-4">Filter by tags</h1>
-        <div className="flex flex-wrap gap-2 px-12 py-4">
-          {uniqueTags.map((tag) => (
-            <label key={tag} className="flex items-center">
-              <input
-                type="checkbox"
-                value={tag}
-                checked={selectedTags.includes(tag)}
-                onChange={() => handleTagChange(tag)}
-                className="mr-2"
-              />
-              {tag}
-            </label>
-          ))}
+        <div
+          className="fixed w-2/3 lg:w-11/12 h-fit bg-slate-100 mt-20 ml-12 rounded-3xl"
+          onClick={() => setIsTagContainerOpen(!isTagContainerOpen)}
+        >
+          <div className="flex flex-row items-center pt-4 pl-5 pb-2">
+            <Image
+              src={"down-arrow-icon.svg"}
+              width={24}
+              height={24}
+              className={`${
+                isTagContainerOpen ? "rotate-180" : "rotate-0"
+              } lg:w-[24px] lg:h-[24px] transform transition duration-300`}
+              alt="dropdown-icon"
+            />
+            <h1 className={"pl-12 text-xl font-semibold"}>Filter by tags</h1>
+          </div>
+          <div
+            className={`${
+              isTagContainerOpen ? "flex" : "hidden"
+            } flex-wrap gap-2 px-1 py-4 transform transition-all`}
+          >
+            {uniqueTags.length > 0
+              ? uniqueTags.map((tag) => (
+                  <label
+                    key={tag}
+                    className="flex items-center text-sm lg:text-lg bg-slate-200 rounded-3xl px-2"
+                  >
+                    <input
+                      type="checkbox"
+                      value={tag}
+                      checked={selectedTags.includes(tag)}
+                      onChange={() => handleTagChange(tag)}
+                      className="mr-2 w-3 h-3 lg:w-5 lg:h-5 peer relative appearance-none 
+                          border 
+                          rounded-full border-gray-500 
+                          cursor-pointer
+                          hover:bg-gray-400  
+                          checked:bg-gray-500 checked:hover:bg-gray-600"
+                    />
+                    {tag}
+                  </label>
+                ))
+              : "no tags yet, create notes first!"}
+          </div>
         </div>
 
         {/* Button to add note */}
@@ -207,17 +249,25 @@ export default function DashboardPage() {
         </Link>
 
         {/* Notes Container */}
-        <div className="w-full h-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-7 lg:gap-x-2 lg:gap-y-8 items-start p-10">
+        <div className="w-full h-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-7 lg:gap-x-2 lg:gap-y-8 items-start p-10 mt-28 lg:mt-28">
           {filteredNotes.map((note) => (
             <div
               key={note.note_id}
-              className="w-[300px] h-[280px] sm:w-[290px] lg:w-[400px] lg:min-h-[300px] flex flex-col p-2 rounded-lg hover:shadow-lg shadow-md transition-all bg-slate-100"
+              className="w-[280px] h-[280px] sm:w-[290px] lg:w-[400px] lg:min-h-[300px] flex flex-col p-2 rounded-lg hover:shadow-lg shadow-md transition-all bg-slate-100 cursor-pointer"
             >
-              <div className="w -full h-fit flex flex-row">
-                <h1 className="text-base lg:text-xl font-bold truncate">
+              <div className="w-full h-fit flex flex-row">
+                <h1 className="text-sm lg:text-xl font-bold truncate">
                   {note.title}
                 </h1>
-                <div className="flex flex-row ml-auto gap-x-2">
+                <div className=" flex flex-row ml-auto gap-x-2">
+                    <Image
+                      src={"/eye-icon.svg"}
+                      width={0}
+                      height={0}
+                      className="w-6 h-6 lg:w-8 lg:h-8 cursor-pointer hover:rotate-12 transition"
+                      alt="eye Icon"
+                      onClick={() => openModal(note)}
+                    />
                   <Link href={`/edit-note/${note.note_id}`}>
                     <Image
                       src={"/edit-icon.svg"}
@@ -257,6 +307,9 @@ export default function DashboardPage() {
           ))}
         </div>
       </div>
+
+      {/* Modal for displaying note details */}
+      <NoteModal note={selectedNote} onClose={closeModal} timeAgo={timeAgo}/>
     </div>
   );
 }

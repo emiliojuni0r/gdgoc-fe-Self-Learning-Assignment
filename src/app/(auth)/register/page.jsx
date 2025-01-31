@@ -11,13 +11,14 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   const handleRegister = async (e) => {
     e.preventDefault();
     setError("");
 
     try {
-      const response = await fetch("http://localhost:5500/auth/register", {
+      const response = await fetch(`${baseUrl}/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

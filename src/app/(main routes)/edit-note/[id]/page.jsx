@@ -16,11 +16,12 @@ export default function EditNotePage({ params }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   useEffect(() => {
     const fetchNote = async () => {
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:5500/notes/${id}`, {
+      const response = await fetch(`${baseUrl}/notes/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -49,7 +50,7 @@ export default function EditNotePage({ params }) {
 
   const handleSaveNote = async () => {
     const token = localStorage.getItem("token");
-    const response = await fetch(`http://localhost:5500/notes/${id}`, {
+    const response = await fetch(`${baseUrl}/notes/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -81,7 +82,7 @@ export default function EditNotePage({ params }) {
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
       ></Header>
-      <div className="px-5 lg:px-14 pt-4 lg:pt-6">
+      <div className="px-5 lg:px-14 pt-16 lg:pt-20">
         <h2 className="text-lg font-bold mb-4">Edit Note</h2>
         <input
           type="text"

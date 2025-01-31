@@ -20,11 +20,12 @@ export default function DashboardPage() {
   const [selectedNote, setSelectedNote] = useState(null); // State untuk menyimpan catatan yang dipilih untuk modal
   const pathname = usePathname();
   const router = useRouter();
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   useEffect(() => {
     const fetchNotes = async () => {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:5500/notes", {
+      const response = await fetch(`${baseUrl}/notes`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -51,7 +52,7 @@ export default function DashboardPage() {
 
   const handleDeleteNote = async (noteId) => {
     const token = localStorage.getItem("token");
-    const response = await fetch(`http://localhost:5500/notes/${noteId}`, {
+    const response = await fetch(`${baseUrl}/notes/${noteId}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -102,22 +103,22 @@ export default function DashboardPage() {
   };
 
   // Fungsi untuk menghitung waktu
-const timeAgo = (timestamp) => {
-  const now = new Date();
-  const seconds = Math.floor((now - new Date(timestamp)) / 1000);
-  let interval = Math.floor(seconds / 31536000);
+  const timeAgo = (timestamp) => {
+    const now = new Date();
+    const seconds = Math.floor((now - new Date(timestamp)) / 1000);
+    let interval = Math.floor(seconds / 31536000);
 
-  if (interval > 1) return `${interval} years ago`;
-  interval = Math.floor(seconds / 2592000);
-  if (interval > 1) return `${interval} months ago`;
-  interval = Math.floor(seconds / 86400);
-  if (interval > 1) return `${interval} days ago`;
-  interval = Math.floor(seconds / 3600);
-  if (interval > 1) return `${interval} hours ago`;
-  interval = Math.floor(seconds / 60);
-  if (interval > 1) return `${interval} minutes ago`;
-  return `${seconds} seconds ago`;
-};
+    if (interval > 1) return `${interval} years ago`;
+    interval = Math.floor(seconds / 2592000);
+    if (interval > 1) return `${interval} months ago`;
+    interval = Math.floor(seconds / 86400);
+    if (interval > 1) return `${interval} days ago`;
+    interval = Math.floor(seconds / 3600);
+    if (interval > 1) return `${interval} hours ago`;
+    interval = Math.floor(seconds / 60);
+    if (interval > 1) return `${interval} minutes ago`;
+    return `${seconds} seconds ago`;
+  };
 
   const handleTagChange = (tag) => {
     const updatedTags = selectedTags.includes(tag)
@@ -260,14 +261,14 @@ const timeAgo = (timestamp) => {
                   {note.title}
                 </h1>
                 <div className=" flex flex-row ml-auto gap-x-2">
-                    <Image
-                      src={"/eye-icon.svg"}
-                      width={0}
-                      height={0}
-                      className="w-6 h-6 lg:w-8 lg:h-8 cursor-pointer hover:rotate-12 transition"
-                      alt="eye Icon"
-                      onClick={() => openModal(note)}
-                    />
+                  <Image
+                    src={"/eye-icon.svg"}
+                    width={0}
+                    height={0}
+                    className="w-6 h-6 lg:w-8 lg:h-8 cursor-pointer hover:rotate-12 transition"
+                    alt="eye Icon"
+                    onClick={() => openModal(note)}
+                  />
                   <Link href={`/edit-note/${note.note_id}`}>
                     <Image
                       src={"/edit-icon.svg"}
@@ -309,7 +310,7 @@ const timeAgo = (timestamp) => {
       </div>
 
       {/* Modal for displaying note details */}
-      <NoteModal note={selectedNote} onClose={closeModal} timeAgo={timeAgo}/>
+      <NoteModal note={selectedNote} onClose={closeModal} timeAgo={timeAgo} />
     </div>
   );
 }
